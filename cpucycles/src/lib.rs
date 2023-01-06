@@ -9,6 +9,7 @@ static CPU_CYCLES_FN: Lazy<CpuCyclesFn> = Lazy::new(|| {
     unsafe { ffi::cpucycles.unwrap() }
 });
 
+#[derive(Clone, Copy)]
 pub struct CpuCycles(CpuCyclesFn);
 
 impl CpuCycles {
@@ -24,11 +25,11 @@ impl CpuCycles {
         }
     }
 
-    pub fn cpucycles(&self) -> i64 {
+    pub fn get(&self) -> i64 {
         unsafe { self.0() }
     }
 
-    pub fn cpucycles_implementation(&self) -> &'static str {
+    pub fn implementation(&self) -> &'static str {
         unsafe {
             CStr::from_ptr(ffi::cpucycles_implementation())
                 .to_str()
@@ -36,14 +37,39 @@ impl CpuCycles {
         }
     }
 
-    pub fn cpucycles_persecond(&self) -> i64 {
+    pub fn per_second(&self) -> i64 {
         unsafe { ffi::cpucycles_persecond() }
+    }
+
+    pub fn instant(&self) -> Instant {
+        Instant {
+            start: self.get(),
+            cpu_cycles: *self,
+        }
     }
 }
 
 impl Default for CpuCycles {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[derive(Clone, Copy)]
+pub struct Instant {
+    start: i64,
+    cpu_cycles: CpuCycles,
+}
+
+impl Instant {
+    pub fn now() -> Self {
+        let cpu_cycles = CpuCycles::new();
+        let start = cpu_cycles.get();
+        Instant { start, cpu_cycles }
+    }
+
+    pub fn elapsed(&self) -> i64 {
+        self.cpu_cycles.get() - self.start
     }
 }
 
@@ -59,20 +85,29 @@ mod tests {
     #[test]
     fn cpucycles_test() {
         let cpu_cycles = CpuCycles::new();
-        let start = cpu_cycles.cpucycles();
-        let end = cpu_cycles.cpucycles();
+        let start = cpu_cycles.get();
+        let end = cpu_cycles.get();
         assert!(end >= start);
     }
 
     #[test]
     fn cpucycles_persecond_test() {
-        assert!(CpuCycles::new().cpucycles_persecond() > 0);
+        assert!(CpuCycles::new().per_second() > 0);
     }
 
     #[test]
     fn cpucycles_implementation_test() {
         // TODO: make this test pass on other arch/os configurations
         let expected = ["amd64-pmc", "amd64-tsc", "amd64-tscasm"];
-        assert!(expected.contains(&CpuCycles::new().cpucycles_implementation()));
+        assert!(expected.contains(&CpuCycles::new().implementation()));
+    }
+
+    #[test]
+    fn instant_test() {
+        let instant = Instant::now();
+        assert!(instant.elapsed() >= 0);
+
+        let instant = CpuCycles::new().instant();
+        assert!(instant.elapsed() >= 0);
     }
 }
