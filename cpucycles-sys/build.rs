@@ -1,18 +1,25 @@
 use std::path::PathBuf;
 use std::process::Command;
+use copy_dir::copy_dir;
 
 const PATH: &str = "./vendor/libcpucycles-20230105";
 
 fn main() {
     let out_dir = std::env::var("OUT_DIR").unwrap();
+    // We move to OUT_DIR because we can't tell configure
+    // to build in OUT_DIR and we don't want to modify vendor
+    // directory.
+    let path = format!("{out_dir}/libcpucycles");
+    let _ = std::fs::remove_dir_all(&path);
+    copy_dir(PATH, &path).unwrap();
     Command::new("./configure")
         .arg(format!("--prefix={out_dir}"))
-        .current_dir(PATH)
+        .current_dir(&path)
         .status()
         .unwrap();
     Command::new("make")
         .arg("install")
-        .current_dir(PATH)
+        .current_dir(path)
         .status()
         .unwrap();
 
@@ -28,15 +35,5 @@ fn main() {
 
     println!("cargo:rustc-link-search=native={}/lib", out_dir);
     println!("cargo:rustc-link-lib=static=cpucycles");
-
-    println!("cargo:rerun-if-changed={PATH}/autogen");
-    // println!("cargo:rerun-if-changed={PATH}/build");
-    println!("cargo:rerun-if-changed={PATH}/command");
-    println!("cargo:rerun-if-changed={PATH}/compilers");
-    println!("cargo:rerun-if-changed={PATH}/configure");
-    println!("cargo:rerun-if-changed={PATH}/cpucycles");
-    println!("cargo:rerun-if-changed={PATH}/doc");
-    println!("cargo:rerun-if-changed={PATH}/Makefile");
-    println!("cargo:rerun-if-changed={PATH}/scripts-build");
-    println!("cargo:rerun-if-changed={PATH}/version");
+    println!("cargo:rerun-if-changed={PATH}");
 }

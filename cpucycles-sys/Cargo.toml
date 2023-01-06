@@ -1,6 +1,6 @@
 [package]
 name = "cpucycles-sys"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license = "AGPL-3.0-only"
 description = "FFI bindings to libcpucycles"
@@ -11,3 +11,4 @@ description = "FFI bindings to libcpucycles"
 
 [build-dependencies]
 bindgen = "0.53.1"
+copy_dir = "0.1"
