@@ -72,7 +72,7 @@ mod tests {
     #[test]
     fn cpucycles_implementation_test() {
         // TODO: make this test pass on other arch/os configurations
-        let expected = ["amd64-pmc", "amd64-tsc"];
+        let expected = ["amd64-pmc", "amd64-tsc", "amd64-tscasm"];
         assert!(expected.contains(&CpuCycles::new().cpucycles_implementation()));
     }
 }
