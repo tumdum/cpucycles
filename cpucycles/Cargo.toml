@@ -1,6 +1,6 @@
 [package]
 name = "cpucycles"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 license = "AGPL-3.0-only"
 description = "libcpucycles bindings"
@@ -8,5 +8,5 @@ description = "libcpucycles bindings"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ffi = { package = "cpucycles-sys", version = "0.1.1", path = "../cpucycles-sys" }
+ffi = { package = "cpucycles-sys", version = "0.1.2", path = "../cpucycles-sys" }
 once_cell = "1.0"
