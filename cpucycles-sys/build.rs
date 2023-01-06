@@ -1,6 +1,6 @@
+use copy_dir::copy_dir;
 use std::path::PathBuf;
 use std::process::Command;
-use copy_dir::copy_dir;
 
 const PATH: &str = "./vendor/libcpucycles-20230105";
 

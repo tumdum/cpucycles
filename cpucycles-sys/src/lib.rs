@@ -1,4 +1,4 @@
-#![allow(non_upper_case_globals)]
+#![allow(non_upper_case_globals, clippy::redundant_static_lifetimes)]
 
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
